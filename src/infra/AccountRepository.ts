@@ -74,6 +74,14 @@ export class AccountRepository {
     }));
   }
 
+  async getIdsByHobbies(hobby: string[]): Promise<string[]> {
+    const result = await this.prismaService.accountHobby.findMany({
+      select: { accountId: true },
+      where: { hobbyName: { in: hobby } },
+    });
+    return result.map((r) => r.accountId);
+  }
+
   async findById(id: string) {
     const raw = await this.prismaService.account.findUnique({
       where: { id },

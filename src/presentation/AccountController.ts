@@ -8,6 +8,7 @@ import {
   UpdateAccountUsecase,
 } from '../application/account/UpdateAccountUsecase';
 import { AccountAppService } from '../application/account/AccountAppService';
+import { LoadDashboardUsecase } from '../application/account/LoadDashboardUsecase';
 
 type SanitizedAccount = {
   id: string;
@@ -28,7 +29,7 @@ const sanitizeAccount = (account: Account): SanitizedAccount => {
 const flattenHobbies = (result: {
   account: Account;
   publicHobbies: string[];
-  privateHobbies: string[];
+  privateHobbies?: string[];
 }) => {
   return {
     ...sanitizeAccount(result.account),
@@ -40,9 +41,9 @@ const flattenHobbies = (result: {
 @Controller('/v1/accounts/')
 export class AccountController {
   constructor(
-    private readonly accountRepository: AccountRepository,
     private readonly updateAccountUsecase: UpdateAccountUsecase,
     private readonly accountAppService: AccountAppService,
+    private readonly loadDashboardUsecase: LoadDashboardUsecase,
   ) {}
 
   @Get('me')
@@ -65,5 +66,18 @@ export class AccountController {
   ) {
     const accountId = session.getAccountId();
     await this.updateAccountUsecase.exec(accountId!, input);
+  }
+
+  @Get('fellows')
+  async fellows(@CurrentSession() session: SessionInterface) {
+    const result = await this.loadDashboardUsecase.load(
+      session.getAccountId()!,
+    );
+    return {
+      byHobby: result.byHobby.map((hobby) => ({
+        hobby: hobby.hobby,
+        accounts: hobby.accounts.map(flattenHobbies),
+      })),
+    };
   }
 }

@@ -18,6 +18,17 @@ export class HobbyRepository {
     );
   }
 
+  async searchSimilarHobbies(name: string): Promise<string[]> {
+    const hobby = await this.prismaService.hobby.findUnique({
+      where: { name: name },
+    });
+    if (!hobby) throw new Error('Hobby not found');
+    const similarHobbies = await this.searchService.searchSimilarHobbies(
+      hobby.vector,
+    );
+    return similarHobbies;
+  }
+
   async save(hobby: Hobby): Promise<void> {
     await this.searchService.indexHobby(hobby.name, hobby.embeddings);
     await this.prismaService.hobby.upsert({
