@@ -23,6 +23,32 @@ model Account {
   displayName String
   password String
   affiliation String?
+  icon String?
+
+  hobbies AccountHobby[]
 
   @@map("account")
+}
+
+model Hobby {
+  name String @id
+  description String
+  vector Float[]
+
+  accounts AccountHobby[]
+
+  @@map("hobby")
+}
+
+model AccountHobby {
+  accountId String @map("account_id") @db.Uuid
+  hobbyName String @map("hobby_name")
+  account Account @relation(fields: [accountId], references: [id])
+  hobby Hobby @relation(fields: [hobbyName], references: [name])
+  isPublic Boolean @default(false) @map("is_public")
+
+  @@id([accountId, hobbyName])
+  @@index([hobbyName])
+
+  @@map("account_hobby")
 }

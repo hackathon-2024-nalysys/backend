@@ -38,4 +38,8 @@ export class Account {
   checkPassword(password: string): boolean {
     return compareSync(password, this.password);
   }
+
+  setDisplayName(displayName: string): void {
+    this.displayName = displayName;
+  }
 }

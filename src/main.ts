@@ -33,11 +33,16 @@ async function bootstrap() {
     }),
   );
 
-  app.use(cors());
+  app.use(
+    cors({
+      origin: ['http://localhost:3000', 'http://localhost:3000/'],
+      credentials: true,
+    }),
+  );
 
   await redisClient.connect();
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
