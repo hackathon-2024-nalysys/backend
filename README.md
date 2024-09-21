@@ -1,6 +1,7 @@
 ```
 npm install
-npm run dev
+docker compose up -d
+npm run start:dev
 ```
 
 ```
