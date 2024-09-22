@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { CurrentSession } from './session';
 import { SessionInterface } from '../application/auth/SessionInterface';
 import { AccountRepository } from '../infra/AccountRepository';
@@ -9,6 +9,8 @@ import {
 } from '../application/account/UpdateAccountUsecase';
 import { AccountAppService } from '../application/account/AccountAppService';
 import { LoadDashboardUsecase } from '../application/account/LoadDashboardUsecase';
+import { Unauthorized } from './authDecorators';
+import { hashSync } from 'bcrypt';
 
 type SanitizedAccount = {
   id: string;
@@ -41,10 +43,24 @@ const flattenHobbies = (result: {
 @Controller('/v1/accounts/')
 export class AccountController {
   constructor(
+    private readonly accountRepository: AccountRepository,
     private readonly updateAccountUsecase: UpdateAccountUsecase,
     private readonly accountAppService: AccountAppService,
     private readonly loadDashboardUsecase: LoadDashboardUsecase,
   ) {}
+
+  @Unauthorized()
+  @Post('/')
+  async create(@Body() input: UpdateAccountInput) {
+    const account = Account.create({
+      name: input.displayName,
+      ...input,
+      password: 'password',
+      affiliation: null,
+    });
+    await this.accountRepository.save(account);
+    await this.updateAccountUsecase.exec(account.id, input);
+  }
 
   @Get('me')
   async me(@CurrentSession() session: SessionInterface) {

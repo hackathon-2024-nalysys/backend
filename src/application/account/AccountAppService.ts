@@ -30,15 +30,19 @@ export class AccountAppService {
     }));
   }
 
-  async searchAccountsWithHobbies(hobby: string): Promise<
-    {
+  async searchAccountsWithHobbies(hobby: string): Promise<{
+    accounts: {
       account: Account;
       publicHobbies: string[];
       privateHobbies: string[];
-    }[]
-  > {
+    }[];
+    similars: string[];
+  }> {
     const similars = await this.hobbyRepository.searchSimilarHobbies(hobby);
     const accountIds = await this.accountRepository.getIdsByHobbies(similars);
-    return await this.loadAccountsWithHobbies(accountIds);
+    return {
+      similars,
+      accounts: await this.loadAccountsWithHobbies(accountIds),
+    };
   }
 }
