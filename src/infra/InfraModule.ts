@@ -6,6 +6,7 @@ import { GenerativeAiImpl } from './GenerativeAiImpl';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { HobbyRepository } from './HobbyRepository';
 import { SearchService } from './SearchService';
+import { HashedIconPicker } from './HashedIconPicker';
 
 @Global()
 @Module({
@@ -15,6 +16,7 @@ import { SearchService } from './SearchService';
     }),
   ],
   providers: [
+    HashedIconPicker,
     PrismaService,
     SearchService,
     {
@@ -24,6 +26,11 @@ import { SearchService } from './SearchService';
     AccountRepository,
     HobbyRepository,
   ],
-  exports: [AccountRepository, HobbyRepository, GENERATIVE_AI],
+  exports: [
+    AccountRepository,
+    HobbyRepository,
+    GENERATIVE_AI,
+    HashedIconPicker,
+  ],
 })
 export class InfraModule {}

@@ -11,6 +11,7 @@ import { AccountAppService } from '../application/account/AccountAppService';
 import { LoadDashboardUsecase } from '../application/account/LoadDashboardUsecase';
 import { Unauthorized } from './authDecorators';
 import { hashSync } from 'bcrypt';
+import { HashedIconPicker } from '../infra/HashedIconPicker';
 
 type SanitizedAccount = {
   id: string;
@@ -47,6 +48,7 @@ export class AccountController {
     private readonly updateAccountUsecase: UpdateAccountUsecase,
     private readonly accountAppService: AccountAppService,
     private readonly loadDashboardUsecase: LoadDashboardUsecase,
+    private readonly iconPicker: HashedIconPicker,
   ) {}
 
   @Unauthorized()
@@ -92,7 +94,11 @@ export class AccountController {
     return {
       byHobby: result.byHobby.map((hobby) => ({
         hobby: hobby.hobby,
-        accounts: hobby.accounts.map(flattenHobbies),
+        isPublic: hobby.isPublic,
+        accounts: hobby.accounts.map(flattenHobbies).map((account) => ({
+          ...account,
+          icon: `http://localhost:3000/api/assets/icons/${encodeURIComponent(this.iconPicker.pickIcon(account.id))}`,
+        })),
       })),
     };
   }

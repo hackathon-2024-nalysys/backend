@@ -9,8 +9,10 @@ export type AccountWithHobbies = {
 };
 
 export type DashboardData = {
+  hotList: AccountWithHobbies[];
   byHobby: {
     hobby: string;
+    isPublic: boolean;
     accounts: AccountWithHobbies[];
   }[];
 };
@@ -38,6 +40,7 @@ export class LoadDashboardUsecase {
 
   async load(accountId: string): Promise<DashboardData> {
     const dashboardData: DashboardData = {
+      hotList: [],
       byHobby: [],
     };
 
@@ -51,6 +54,7 @@ export class LoadDashboardUsecase {
         await this.accountAppService.searchAccountsWithHobbies(hobby);
       dashboardData.byHobby.push({
         hobby,
+        isPublic: account.publicHobbies.includes(hobby),
         accounts: sanitizeAccounts(accountId, accounts, similars),
       });
     }

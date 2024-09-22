@@ -7,6 +7,7 @@ import RedisStore from 'connect-redis';
 import * as redis from 'redis';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cors from 'cors';
+import * as express from 'express';
 
 config();
 
@@ -32,6 +33,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.use('/assets', express.static('assets'));
 
   app.use(
     cors({
